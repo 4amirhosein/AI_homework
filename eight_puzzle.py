@@ -140,7 +140,7 @@ class EightPuzzle:
                 print("reached to a local minimum")            
                 return 0
             
-
+    # def simulated
         
 
     
