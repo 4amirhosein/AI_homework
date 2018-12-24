@@ -84,22 +84,23 @@ class EightQueen:
             sorted_successors = sorted(successors , key = lambda x: x[1] )
             best_successor = sorted_successors[0]
 
-            self.show_in_table()
-            print(current_cost)
+            # self.show_in_table()
+            # print(current_cost)
 
             if best_successor[1] < current_cost:
                 self.queens_coordinates = best_successor[0]
             elif current_cost == 0:
-                print("reached to global minimum ")
-                return 0
-            else :
-                print("reached to local minimum ")
+                # print("reached to global minimum ")
                 return 1
+            else :
+                # print("reached to local minimum ")
+                return 0
 
 
 if  __name__== "__main__":
     
-    
+    print("8 queen problem")
+    print("waiting...")
     failed_numbers = 0
     successfull_numbers = 0
     for i in range(100):
@@ -110,4 +111,5 @@ if  __name__== "__main__":
             successfull_numbers += 1
         else :
             failed_numbers += 1
-    print("failed : {} , and successfull : {}".format(failed_numbers,successfull_numbers))
+    print("hill climbing for 100 example : failed : {} , and successfull : {}".format(failed_numbers,successfull_numbers))
+    

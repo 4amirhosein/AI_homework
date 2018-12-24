@@ -1,6 +1,6 @@
-from random import randint
-
-
+from random import randint,uniform
+from pprint import pprint
+import math
 class EightPuzzle:
 
 
@@ -95,7 +95,7 @@ class EightPuzzle:
 
     # getting to a randome initial state
     def break_puzzle(self):
-        for i in range(100):
+        for i in range(80):
             randome_number = randint(0,3)
             if (randome_number == 0):
                 self.move_right()
@@ -119,29 +119,99 @@ class EightPuzzle:
         while True:
             best_successors = self.get_best_successor()
             current_cost = self.manhattan_cost()
-            print("the successors of state: {} and the cost of this state :{}".format(best_successors , self.manhattan_cost()))
+
+            # self.show_puzzle()
+            # print("the successors of state: {} and the cost of this state :{}".format(best_successors , self.manhattan_cost()))
             # self.show_puzzle()
             best_successors = sorted(best_successors , key = lambda x: x[1] )
             best_successor = best_successors[0]
 
+
             if(best_successor[1] < current_cost):
                 if(best_successor[0] == 'right'):
                     self.move_right()
-                if(best_successor[0] == 'left'):
+                elif(best_successor[0] == 'left'):
                     self.move_left()
-                if(best_successor[0] == 'up'):
+                elif(best_successor[0] == 'up'):
                     self.move_up()
-                if(best_successor[0] == 'down'):
+                elif(best_successor[0] == 'down'):
                     self.move_down()
             elif ( self.manhattan_cost() == 0 ):
-                print("reached to a global minimum")
+                # print("reached to a global minimum")
                 return 1
             else:
-                print("reached to a local minimum")            
+                # print("reached to a local minimum")            
                 return 0
-            
-    # def simulated
+
+    def schedule(self,t):
         
+        return t - t * .03
+
+    def simulated_annealing(self):
+        T = 40
+        for t in range(1000):
+            successors = self.get_best_successor()
+            current_cost = self.manhattan_cost()
+            T = self.schedule(T)
+            # if T == 0:
+            #     if self.manhattan_cost() == 0:
+            #         return 1
+            #     else :
+            #         return 0
+            #     break 
+            random_index = randint(0,len(successors) - 1 )
+            random_successor = successors[random_index]
+
+            cost_for_random_move = 0
+
+            if random_successor[0] == 'right':
+                self.move_right()
+                cost_for_random_move = self.manhattan_cost()
+                self.move_left()
+            elif random_successor[0] == 'left':
+                self.move_left()
+                cost_for_random_move = self.manhattan_cost()
+                self.move_right()
+            elif random_successor[0] == 'up':
+                self.move_up()
+                cost_for_random_move = self.manhattan_cost()
+                self.move_down()
+            elif random_successor[0] == 'down':
+                self.move_down()
+                cost_for_random_move = self.manhattan_cost()
+                self.move_up()
+
+            # print("randome successor {}".format(random_successor))
+            # print("current cost {} ".format(current_cost))
+            # print("random cost {} ".format(cost_for_random_move))
+            
+            # print("delta {}".format(delta_e))
+            # print("Probabilty {}".format(uniform(0,1) < math.exp(delta_e / T)))
+            # print("T : {}".format(T))
+
+            delta_e = current_cost - cost_for_random_move 
+            if(delta_e > 0):
+                if(random_successor[0] == 'right'):
+                    self.move_right()
+                elif(random_successor[0] == 'left'):
+                    self.move_left()
+                elif(random_successor[0] == 'up'):
+                    self.move_up()
+                elif(random_successor[0] == 'down'):
+                    self.move_down()
+            elif uniform(0,1) < math.exp(delta_e / T):
+                if(random_successor[0] == 'right'):
+                    self.move_right()
+                elif(random_successor[0] == 'left'):
+                    self.move_left()
+                elif(random_successor[0] == 'up'):
+                    self.move_up()
+                elif(random_successor[0] == 'down'):
+                    self.move_down()
+        if self.manhattan_cost() == 0:
+            return 1
+        else :
+            return 0
 
     
 
@@ -157,3 +227,30 @@ class EightPuzzle:
 
 
 
+if __name__ == "__main__":
+    print("8 puzzle problem")
+    failed_numbers = 0
+    successfull_numbers = 0
+    for i in range(100):
+        puzzle = EightPuzzle()
+        puzzle.break_puzzle()
+        result = puzzle.hill_climbing()
+        if(result == 1):
+            successfull_numbers += 1
+        else :
+            failed_numbers += 1
+    print("for hill climbing for 100 example : failed : {} , and successfull : {}".format(failed_numbers,successfull_numbers))
+
+    failed_numbers = 0
+    successfull_numbers = 0
+    for i in range(100):
+        puzzle = EightPuzzle()
+        puzzle.break_puzzle()
+        result = puzzle.simulated_annealing()
+        if(result == 1):
+            successfull_numbers += 1
+        else :
+            failed_numbers += 1
+    print("for simulated annealing 100 example : failed : {} , and successfull : {}".format(failed_numbers,successfull_numbers))
+
+    
