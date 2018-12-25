@@ -3,11 +3,12 @@ from pprint import pprint
 import math
 class EightPuzzle:
 
-
+    searched_states = []
     def __init__(self):
         self.row_of_blank = 2
         self.column_of_blank = 2
         self.map = [[1,2,3], [4,5,6] , [7,8,0]]
+        self.searched_states = []
     
     # move puzzle functions
     # these four functions below are for moving the puzzle
@@ -17,6 +18,8 @@ class EightPuzzle:
             self.map[self.row_of_blank][self.column_of_blank - 1] = 0
             self.map[self.row_of_blank][self.column_of_blank ] = temp
             self.column_of_blank -= 1
+            if(self.map not in self.searched_states):
+                self.searched_states.append([self.map])
 
     def move_right(self):
         if(self.column_of_blank < 2):
@@ -24,6 +27,9 @@ class EightPuzzle:
             self.map[self.row_of_blank][self.column_of_blank + 1] = 0
             self.map[self.row_of_blank][self.column_of_blank ] = temp
             self.column_of_blank += 1
+            if(self.map not in self.searched_states):
+                self.searched_states.append([self.map])
+
 
     def move_up(self):
         if(self.row_of_blank > 0):
@@ -31,6 +37,8 @@ class EightPuzzle:
             self.map[self.row_of_blank -1][self.column_of_blank ] = 0
             self.map[self.row_of_blank][self.column_of_blank ] = temp
             self.row_of_blank -= 1
+            if(self.map not in self.searched_states):
+                self.searched_states.append([self.map])
 
     def move_down(self): 
         if(self.row_of_blank < 2):
@@ -38,6 +46,8 @@ class EightPuzzle:
             self.map[self.row_of_blank +1][self.column_of_blank ] = 0
             self.map[self.row_of_blank][self.column_of_blank ] = temp
             self.row_of_blank += 1
+            if(self.map not in self.searched_states):
+                self.searched_states.append([self.map])       
     # end of move functions 
 
     # functions for calculating manhattan cost
@@ -138,14 +148,16 @@ class EightPuzzle:
                     self.move_down()
             elif ( self.manhattan_cost() == 0 ):
                 # print("reached to a global minimum")
+                # print(self.searched_states)
                 return 1
             else:
-                # print("reached to a local minimum")            
+                # print("reached to a local minimum")         
                 return 0
+            
 
     def schedule(self,t):
         
-        return t - t * .03
+        return t - t * .04
 
     def simulated_annealing(self):
         T = 40
@@ -153,12 +165,12 @@ class EightPuzzle:
             successors = self.get_best_successor()
             current_cost = self.manhattan_cost()
             T = self.schedule(T)
-            # if T == 0:
-            #     if self.manhattan_cost() == 0:
-            #         return 1
-            #     else :
-            #         return 0
-            #     break 
+            if T < 0:
+                if self.manhattan_cost() == 0:
+                    return 1
+                else :
+                    return 0
+                break 
             random_index = randint(0,len(successors) - 1 )
             random_successor = successors[random_index]
 
@@ -188,7 +200,7 @@ class EightPuzzle:
             # print("delta {}".format(delta_e))
             # print("Probabilty {}".format(uniform(0,1) < math.exp(delta_e / T)))
             # print("T : {}".format(T))
-
+            
             delta_e = current_cost - cost_for_random_move 
             if(delta_e > 0):
                 if(random_successor[0] == 'right'):
@@ -231,26 +243,32 @@ if __name__ == "__main__":
     print("8 puzzle problem")
     failed_numbers = 0
     successfull_numbers = 0
+    searched_states = 0
     for i in range(100):
         puzzle = EightPuzzle()
         puzzle.break_puzzle()
         result = puzzle.hill_climbing()
+        searched_states += len(puzzle.searched_states)
         if(result == 1):
             successfull_numbers += 1
         else :
             failed_numbers += 1
     print("for hill climbing for 100 example : failed : {} , and successfull : {}".format(failed_numbers,successfull_numbers))
+    print("and Mean searched states for each puzzle is {}".format(searched_states/100))
 
     failed_numbers = 0
     successfull_numbers = 0
+    searched_states = 0
     for i in range(100):
         puzzle = EightPuzzle()
         puzzle.break_puzzle()
         result = puzzle.simulated_annealing()
+        searched_states += len(puzzle.searched_states)
         if(result == 1):
             successfull_numbers += 1
         else :
             failed_numbers += 1
     print("for simulated annealing 100 example : failed : {} , and successfull : {}".format(failed_numbers,successfull_numbers))
+    print("and Mean searched states for each puzzle is {}".format(searched_states/100))
 
     
